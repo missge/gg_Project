@@ -9,7 +9,7 @@
 
 <script>
 import { loginIntercept } from "./api/api";
-import 'babel-polyfill'
+// import 'babel-polyfill'
 export default {
   name: 'app',
   methods:{

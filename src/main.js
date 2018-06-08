@@ -9,6 +9,7 @@ import store from './store'
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+import 'babel-polyfill'
 
 Vue.config.productionTip = false
 axios.defaults.withCredentials=true

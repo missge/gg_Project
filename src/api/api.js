@@ -75,7 +75,7 @@ export const mallId ='123307710000000'
 }
 /***************************登录*********************************/
 export const requestLogin = params => {
-    return loginInstance.post(`${base}loginInfo.json`, formData(params)).then(responseFilter);
+    return axios.post(`${base}loginInfo.json`, qs.stringify(params),{emulateJSON:true}).then(responseFilter);
 
 }
 /***************************平台账单*****************************/

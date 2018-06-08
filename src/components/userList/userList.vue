@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<el-form :inline="true" :model="tableList" class="demo-form-inline query-form">
+		
 			<el-form-item label="部门名称:">
 				<el-select v-model="tableList.bumenname" placeholder=""> 
 				    <el-option
@@ -38,7 +39,10 @@
 	     	<div class="query_button">
 	      		<el-form-item>
 	                <el-button type="primary" @click="getSarch(tableList.bumenname,tableList.kahao,tableList.zhuangtai,tableList.xingming)" >查询</el-button>
-	           </el-form-item>
+	       			<el-button  @click="setReset">重置</el-button>
+		       </el-form-item>
+
+
 	      	</div>
 		</el-form>
 		<div class="table"> 
@@ -178,6 +182,13 @@
 
 				}
 
+			},
+			setReset(){
+				this.tableList.bumenname=''
+				this.tableList.zhuangtai=''
+				this.tableList.kahao=''
+				this.tableList.xingming=''
+				
 			},
 		
 		},

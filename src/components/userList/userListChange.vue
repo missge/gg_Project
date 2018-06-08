@@ -137,7 +137,7 @@
                     <el-input v-model="ruleForm.shenfenzhengzhuzhi"></el-input>
                   </el-form-item>
                    <el-form-item label="物理码" prop="desc">
-                      <el-input type="textarea" v-model="ruleForm.wulima" :disabled="true" height="20px"></el-input>
+                      <el-input v-model="ruleForm.wulima" :disabled="true" height="20px"></el-input>
                     </el-form-item>
                    <el-form-item label="领卡时间" >
                       <el-col :span="11">
@@ -148,6 +148,13 @@
                     </el-form-item>
               </el-col>
           </el-row>
+          <div class="upimage">
+            <span>上传照片</span>
+            <div class="uploader">
+               <div v-if="clickDisabled">   {{ruleForm.zhaopian}} </div> 
+              <uploader  :userName="this.ruleForm.xingming"   :src="this.localHostUrl+'/updateFile.json'" @newNodeEvent="parentLisen" @getFileIds="setFileIds" @getClickDisabled="setClickDisabled" ></uploader>
+            </div>
+          </div>
           <el-form-item>
             <el-button type="primary" @click="seveFn()">保存</el-button>
             <el-button  @click="returnFn()">返回</el-button>
@@ -179,10 +186,11 @@
                           <el-button  type="text"> {{buttonList.zhiwenStatus}}    </el-button>
                         </el-col>
                         <el-col :span="7">
-                          <el-button  type="text">读身份证</el-button>
+                          <el-button  type="text" @click="readIdCard">读身份证</el-button>
                           <el-button  type="text">采集指纹</el-button>
                           <el-button  type="text" :disabled="buttonList.dayin===0" @click="OperateFn('print')">打印</el-button>
                           <el-button  type="text" :disabled="buttonList.faka===0" @click="OperateFn('writeCard')">发卡</el-button>
+                       <el-button  type="text"  @click="duwulimaFn">读物理码</el-button>
                           <el-button  type="text" :disabled="buttonList.tuika===0" @click="OperateFn('backCard')"> 退卡 </el-button>
                         </el-col>
                     </el-row>
@@ -254,11 +262,14 @@
 
       </div>
     <object  id="testActive" classid="CLSID:420D42A0-3BB6-4A7C-AA2F-0EE06AC836D9" ></object>
-      
+    <!--手动读卡-->
+     <OBJECT classid="clsid:F1317711-6BDE-4658-ABAA-39E31D3704D3" codebase="SDRdCard.cab#version=2,0,1,0"  width="390" height="300"  align="center"  hspace=0
+	  vspace="0"  id="idcard"	  name="rdcard"	></OBJECT> 
   </div>
 </template>
 <script>
   import {userListChange,saveUserList,BumenZhuangtaiSelect,cardMembersOperate,getUserList,goHistory} from '../../api/api.js';
+  import uploader from '../publicCom/uploader.vue'
 	import {setCookie,getCookie,delCookie} from '../../cookie/cookie.js'
   import qs from 'qs'
   import Vue from 'vue'
@@ -279,12 +290,13 @@
               }
             ]
           },
+          localHostUrl:"http://h20z908444.imwork.net:17523/ggstSys/",
           activeNames: ['1'],
           activeNames1: ['1'],
-          
           bianhao:this.$route.query.bianhao,
           AddOrChange:this.$route.query.AddOrChange,
           ruleForm:{
+            wulima:'',
             type:this.$route.query.AddOrChange,
             bianhao:'',
             xingming:'',
@@ -314,7 +326,9 @@
             zhaopian:'',
             dayin:'',
             caiID:'',
-            caizhiwen:''	
+            caizhiwen:'',
+            reImgId:'',
+            zhaopian:''
           },//form表单必须是一个对象，否则会报错
           checkboxList:[],
           checkedUser:[],
@@ -325,7 +339,7 @@
           bumenList:[],
           buttonList:[],
           clickList:{
-             bianhao:this.$route.query.bianhao,
+             bianhao:'',
              method:'',
              params:''
           },
@@ -341,45 +355,24 @@
           nextbianhao:'',
           params:this.$route.query.params,
           isShow:false,
-          fakaParams:{
-	              errMsg:"00",
-                //** 用户卡（复旦）参数 **/ 
-                 p1:'',
-                //** PSAM卡参数 **/
-                p2:"20180420",
-                p3:"20380420",
-                p4:"00",
-                info1:'',
-                info2:'',
-                info3:'',
-                info4:'',
-                info5:'',
-                info6:'',
-                info7:"",
-                info8:"8888",
-                info9:"9999",
-                info10:"aaaa",
-                fingerprint:"12345678901234567890",
-                /** 用户卡（复旦）参数 **/
-                reader:1,
-                card:2,
-                base:0,
-                /** PSAM卡参数 **/
-          },
-          myValue:''
+          myValue:'',
+          fileIds:'',
+          clickDisabled:true,
         }
       },
-      methods: {
+      methods: { 
         getTablelist(){
           //标志是点击添加，还是修改按钮
           if(this.AddOrChange==2){
             userListChange({bianhao:this.bianhao,params:this.params}).then((data) => {
               this.ruleForm=data.data
               this.lishi=data.data.lishi
+               this.clickList.bianhao=data.data.bianhao 
               this.buttonList=data.data.button
               this.lastbianhao=data.data.lastBianhao
               this.nextbianhao=data.data.nextBianhao
-            }).catch(message => {
+              console.log(data)
+            }).catch(message => { 
               this.$message.error("请求失败，请联系客服，失败码"+message);
               this.loading=false
             })
@@ -397,21 +390,21 @@
             this.getTablelist()
         },
         seveFn(){
-          // if(this.$route.query.AddOrChange==1 ){
-          //   this.ruleForm.bumen=this.$route.query.bumenname
-          // }
-
           if(this.ruleForm.xingming!==""&&this.ruleForm.bumen!=="" && this.ruleForm.xingbie!=="")
            {
               this.ruleForm.type = this.$route.query.AddOrChange
+             
               saveUserList(this.ruleForm).then((data)=>{
                 if(data.code==1){
-                   if(this.$route.query.AddOrChange){
+                    if(this.$route.query.AddOrChange){
                       alert("修改成功")
-                      this.$router.push({path:'/userList'})
+                      // this.$router.push({path:'/userList'})
+                      // this.getTablelist()
+                      location.reload()
                     }else{
                       alert("添加成功")
                     }
+
                 }
                
               }).catch(message => {
@@ -423,6 +416,11 @@
             alert("此字段不能为空")
           }
          
+        },
+        parentLisen(evtValue) {
+           this.ruleForm.reImgId=evtValue
+          // alert( this.ruleForm.reImgId)
+          //evtValue 是子组件传过来的值
         },
         getRadioFn(val){
           this.ruleForm.userLevel=val
@@ -471,32 +469,66 @@
           this.$router.push({path:'/userList'})
         },
         OperateFn(flag){
-          this.clickList.method=flag
-          if(flag="writeCard"){
-            this.clickList.params=0
-          }
+           this.clickList.method=flag
+            if(flag=="writeCard"){
+              this.clickList.params=0
+            }else{
+              this.clickList.params=''
+            }
            cardMembersOperate(this.clickList).then((data)=>{
                 if(data.code==1){
+                  let fakaId=data.fakaId
                    this.getTablelist();
+                   //打印
                     if(flag=="print"){
                       this.printContent()
-                    }else if(flag=="writeCard"){
-                      this.fakaParams.p1=data.fakaId
-                      console.log( this.fakaParams.p1)
-                      alert(testActive)
-                        this.fakaParams.info1=this.ruleForm.xingming
-                       this.fakaParams.info2=this.ruleForm.zhengjianhao
-                       this.fakaParams.info3=this.ruleForm.xingbie
-                       this.fakaParams.info4=this.ruleForm.bumen
-                      this.fakaParams.info5=this.ruleForm.zhiwu
-                      this.fakaParams.info6=this.ruleForm.zhicheng
-                      this.myValue = testActive.CreateUserCard(this.fakaParams.p1,this.fakaParams.p2,this.fakaParams.p3,this.fakaParams.p4,this.fakaParams.info1,this.fakaParams.info2,this.fakaParams.info3,this.fakaParams.info4,this.fakaParams.info5,this.fakaParams.info6,this.fakaParams.info7,this.fakaParams.info8,this.fakaParams.info9,this.fakaParams.info10,this.fakaParams.fingerprint,this.fakaParams.reader,this.fakaParams.card,this.fakaParams.base);
-                      alert( this.myValue)
-                
                     }
+                    //如果是发卡
+                   if(flag=="writeCard"){
+                       var p1=fakaId;
+                      //** PSAM卡参数 **/
+                      var p2="20180420";
+                      var p3="20380420";
+                      var p4="00";
+                      var info1=this.ruleForm.xingming;
+                      var info2=this.ruleForm.zhenghao;
+                      var info3=this.ruleForm.xingbie;
+                      var info4=this.ruleForm.bumen;
+                      var info5=this.ruleForm.zhiwu;
+                      var info6=this.ruleForm.zhicheng;
+                      var info7="7777";
+                      var info8="8888";
+                      var info9="9999";
+                      var info10="aaaa";
+                      var fingerprint="12345678901234567890";
+                      var reader=1;
+                      var card=2;
+                      var base=0;
+                      alert(info1+info2+info3+info4+info5+info6)
+                      var myValue = testActive.CreateUserCard(p1,p2,p3,p4,info1,info2,info3,info4,info5,info6,info7,info8,info9,info10,fingerprint,reader,card,base);
+                      alert(myValue)
+                       if(myValue=='00'){
+                          this.clickList.params=1
+                          cardMembersOperate(this.clickList).then((data)=>{
+                             if(data.code==1){
+                                this.$message('发卡成功');
+                                 
+                             }else{
+                                 this.$message(this.data.descript);
+                             }
+                          })
+                       }else{
+                          this.clickList.params=2
+                            cardMembersOperate(this.clickList).then((data)=>{
+                              this.$message('发卡失败');
+                          })
+                       }
+                    }
+                
                 }
                
-              }).catch(message => {
+              }
+              ).catch(message => {
                 this.$message.error("请求失败，请联系客服，失败码"+message);
                 this.loading=false
               })
@@ -520,13 +552,63 @@
               window.location.reload();  
               document.body.innerHTML = oldContent;  
               return false;  
-          },  
-
+        }, 
+        setFileIds(data){
+          this.fileIds = data;
+        },
+        setClickDisabled(bool){
+          this.clickDisabled = bool;
+        },
+       //读身份证
+        readIdCard(){
+          alert("读取身份证了")
+          var pp ;
+          pp=rdcard.openport();
+          if(pp==0)
+          {
+            alert("打开机具成功");		
+              pp=rdcard.readcard();
+            if(pp==0)
+            {
+              alert("读取身份证成功");
+                Vue.set(this.ruleForm,"shenfenzhenghao",rdcard.CardNo)
+                Vue.set(this.ruleForm,"shenfenzhengzhuzhi",rdcard.Address)
+                this.getTablelist();
+      
+            }else{
+              alert("读取身份证失败");
+            }
+            pp=rdcard.closeport();
+            if(pp==0)
+            {
+              alert("关闭机具成功");
+            }else{
+              alert("关闭机具失败");
+            }
+              
+          }else{
+            alert("打开机具失败");
+          }
+        }	,
+        //读物理吗
+        duwulimaFn(){
+            /** 用户卡（复旦）参数 **/
+            var reader=1;
+            var card=2;
+            var base=0;
+            var ret=testActive.LookCardNO(0,reader,card,base);
+            //要把前两位00去掉。如读出来是0012345678，去掉00
+            Vue.set(this.ruleForm,"wulima",ret.slice(2))
+            this.getTablelist();
+              
+          }
       },
       mounted(){
          this.getTablelist();
-			this.getSelectList();
-        
+		  	this.getSelectList();
+      },
+      components: {
+        uploader
       }
    }
 </script>
@@ -558,5 +640,25 @@
     cursor: pointer
   }
  /* .contr_time  .el-form-item--mini.el-form-item{margin-bottom:0px;} */
-
+  .upimage{
+    position: relative;
+    width: 50%;
+    height: 250px;
+  }
+  .upimage span{
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+    color: #2c3e50;
+    margin-left: 30px;
+  }
+  .uploader{
+    border: 1px solid #c0ccda;
+    border-radius: 5px;
+    width: 75%;
+    margin-left:100px;
+  }
+.pageButton{
+  color: #55c5f5
+  }
 </style>

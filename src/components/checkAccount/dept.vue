@@ -53,10 +53,10 @@
         <div class="table"> 
             <el-table
 			    :data="tableDatas"  border style="width: 100%" v-loading="loading">
-			    <el-table-column   align='left' prop="daima" label="部门代码">  </el-table-column>
-			    <el-table-column   align='left' prop="bumen" label="部门名称">  </el-table-column>
-			    <el-table-column   align='left' prop="maxid" label="新编号">  </el-table-column>
-			    <el-table-column   align='left' label="操作" width="200">
+			    <el-table-column   align='center' prop="daima" label="部门代码">  </el-table-column>
+			    <el-table-column   align='center' prop="bumen" label="部门名称">  </el-table-column>
+			    <el-table-column   align='center' prop="maxid" label="新编号">  </el-table-column>
+			    <el-table-column   align='center' label="操作" width="200">
 	                <template slot-scope="scope">
 	                    <el-button size="small" @click="handleEdit(scope.row.pinyin )">修改</el-button>
 	                    <el-button size="small" @click="handleDel(scope.$index, scope.row,scope.row.pinyin)">删除</el-button>
@@ -81,24 +81,12 @@
 		data () {
 			return {
 				 tableList:{
-		        	//mallId:this.$store.state.mallId,
 		         	pageIndex:1
-		         	/*daima:'',
-		         	bumen:''*/
-		        	//settId:'',
-		         	//status:'',
-		         	//startTime:'',
-		         	//endTime:''
 		         },
 		        editDetials : [],
 
 		        tableDatas:[],
-		        //列表的值
-		        //totalCount:0,//页数
-		       // time:'',
 		        loading: false,
-		        //type:'settStatus',
-		      //  selectList:'',
 		      	dialogFormVisible: false,
 		      	formData: {
 		          bumen: '',
@@ -108,12 +96,6 @@
 		        },
 		        showPinyin : '',
 		        methodName : '',
-				//formInline: {
-				//	user: '',
-				//	region: '',
-				//	name:''
-				//},
-				//oldStatus:''
 				formLabelWidth: '100px',
 				code : ''
 			}
@@ -121,21 +103,6 @@
 		methods:{
 			//获取table列表
 			getTablelist(){
-				// var url = this.$store.state.localHostUrl +'/mallSettInfo.json'
-		  //   	let that= this
-				// that.$http.post(url,data,{emulateJSON:true}).then(
-				// 	function(res){
-				// 		if(res.data.code===1){
-				// 			that.tableDatas=res.data.data
-				// 			that.totalCount=res.data.pageInfo.totalCount
-				// 			that.loading=false
-				// 		}else{
-				// 			that.$message.error("请求失败，请联系客服，失败码"+res.data.descript);
-				// 			that.loading=false
-				// 		}
-				// 	}
-				// )
-		    	// var data= qs.stringify(this.tableList)
 				deptList(this.tableList).then(data => {
 					console.info(data.data);
 					this.tableDatas=data.data
@@ -158,24 +125,11 @@
             	this.methodName = '添加'
             },
 			setReset(){
-				
+				this.tableList.daima=''
+				this.tableList.bumen=''
 			},
 
             handleEdit(pinyin ){
-            	/*var url = this.$store.state.localHostUrl +'searchBuMenInfo.json'
-            	let that= this
-				that.$http.post(url,{pinyin : pinyin},{emulateJSON:true}).then(
-				function(res){
-					if(res.data.code===1){
-						console.info(data.data);
-				 			
-				 		}else{
-				 			that.$message.error("请求失败，请联系客服，失败码"+res.data.descript);
-				 			that.loading=false
-				 		}
-				 	}
-				)*/
-
 				searchBuMenInfo({pinyin : pinyin}).then(data => {
 					console.info(data);
 					this.dialogFormVisible =true
@@ -185,12 +139,7 @@
 	            	this.formData.type = 2
 	            	this.showPinyin = false;
 	            	this.methodName = '修改'
-
 	            	this.editDetials = data.data_ls
-					//this.tableDatas=data.data
-					
-					//this.totalCount=data.pageInfo.totalCount
-					//this.loading=false
 				}).catch(message => {
 					this.$message.error("请求失败，请联系客服，失败码"+message);
 				    this.loading=false
@@ -198,25 +147,6 @@
 			
 
 
-            	/*this.dialogFormVisible =true
-            	this.formData.pinyin = pinyin	
-            	this.formData.name = bumen 
-            	this.formData.daima = daima
-            	this.formData.type = 2
-            	this.showPinyin = false;
-            	this.methodName = '修改'*/
-
-            	/*deptEditSave(this.formData).then(data => {
-            		if(data.code == 1){
-            			this.dialogFormVisible =false
-            			getTablelist()
-            		}else{
-            			this.$message.error("请求失败，请联系客服，失败码"+data.descript);
-            		}
-            	}).catch(message =>{
-            		this.$message.error("请求失败，请联系客服，失败码"+message);
-				    this.loading=false
-            	})*/
             },
 
             handleEditSave(){
