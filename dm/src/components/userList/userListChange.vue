@@ -2,8 +2,9 @@
   <div>
     <div class="FormFile">
       <div>
-          <span @click="page(lastbianhao,'last')" v-if="lastbianhao!=''" class="pageButton">上一页</span>
-          <span @click="page(nextbianhao,'next')" v-if="nextbianhao!=''" class="pageButton">下一页</span>
+        <span @click="page(lastbianhao,'last')">上一页</span>
+        <span @click="page(nextbianhao,'next')">下一页</span>
+        
       </div>
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" size="mini" label-width="100px" class="demo-ruleForm contr_time" >
           <el-row :gutter="24">
@@ -97,7 +98,7 @@
                     <el-input v-model="ruleForm.minzu"></el-input>
                   </el-form-item>
                   <el-form-item label="身份证号" >
-                    <el-input v-model="ruleForm.shenfenzheng"></el-input>
+                    <el-input v-model="ruleForm.shenfenzhenghao"></el-input>
                   </el-form-item>
                   <el-form-item label="籍贯" >
                     <el-input v-model="ruleForm.jiguan"></el-input>
@@ -327,6 +328,7 @@
             caiID:'',
             caizhiwen:'',
             reImgId:'',
+            zhaopian:''
           },//form表单必须是一个对象，否则会报错
           checkboxList:[],
           checkedUser:[],
@@ -391,7 +393,7 @@
           if(this.ruleForm.xingming!==""&&this.ruleForm.bumen!=="" && this.ruleForm.xingbie!=="")
            {
               this.ruleForm.type = this.$route.query.AddOrChange
-              
+             
               saveUserList(this.ruleForm).then((data)=>{
                 if(data.code==1){
                     if(this.$route.query.AddOrChange){
@@ -402,7 +404,9 @@
                     }else{
                       alert("添加成功")
                     }
+
                 }
+               
               }).catch(message => {
                 this.$message.error("请求失败，请联系客服，失败码"+message);
                 this.loading=false
@@ -551,7 +555,6 @@
         }, 
         setFileIds(data){
           this.fileIds = data;
-          this.ruleForm.zhaopian=data;
         },
         setClickDisabled(bool){
           this.clickDisabled = bool;
@@ -568,8 +571,9 @@
             if(pp==0)
             {
               alert("读取身份证成功");
-                Vue.set(this.ruleForm,"shenfenzheng",rdcard.CardNo)
+                Vue.set(this.ruleForm,"shenfenzhenghao",rdcard.CardNo)
                 Vue.set(this.ruleForm,"shenfenzhengzhuzhi",rdcard.Address)
+                this.getTablelist();
       
             }else{
               alert("读取身份证失败");
@@ -595,6 +599,7 @@
             var ret=testActive.LookCardNO(0,reader,card,base);
             //要把前两位00去掉。如读出来是0012345678，去掉00
             Vue.set(this.ruleForm,"wulima",ret.slice(2))
+            this.getTablelist();
               
           }
       },
@@ -656,5 +661,4 @@
 .pageButton{
   color: #55c5f5
   }
-
 </style>
