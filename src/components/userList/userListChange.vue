@@ -150,7 +150,9 @@
           <div class="upimage">
             <span>上传照片</span>
             <div class="uploader">
-               <div v-if="clickDisabled">   {{ruleForm.zhaopian}} </div> 
+               <div v-if="clickDisabled">  
+                  <img :src="ruleForm.zhaopian" width="120px" height="130px" >
+                </div> 
               <uploader  :userName="this.ruleForm.xingming"   :src="this.localHostUrl+'/updateFile.json'" @newNodeEvent="parentLisen" @getFileIds="setFileIds" @getClickDisabled="setClickDisabled" ></uploader>
             </div>
           </div>
@@ -500,9 +502,7 @@
                       var reader=1;
                       var card=2;
                       var base=0;
-                      alert(info1+info2+info3+info4+info5+info6)
                       var myValue = testActive.CreateUserCard(p1,p2,p3,p4,info1,info2,info3,info4,info5,info6,info7,info8,info9,info10,fingerprint,reader,card,base);
-                      alert(myValue)
                        if(myValue=='00'){
                           this.clickList.params=1
                           cardMembersOperate(this.clickList).then((data)=>{
@@ -550,7 +550,6 @@
               return false;  
         }, 
         setFileIds(data){
-          alert(data)
           this.fileIds = data;
           // this.ruleForm.zhaopian=data;
           Vue.set(this.ruleForm,"zhaopian",data)
@@ -641,7 +640,6 @@
   .upimage{
     position: relative;
     width: 50%;
-    height: 250px;
   }
   .upimage span{
     position: absolute;
@@ -657,7 +655,8 @@
     margin-left:100px;
   }
 .pageButton{
-  color: #55c5f5
+  color: #55c5f5;
+ cursor: pointer;
   }
 
 </style>
