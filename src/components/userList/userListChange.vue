@@ -550,8 +550,11 @@
               return false;  
         }, 
         setFileIds(data){
+          alert(data)
           this.fileIds = data;
-          this.ruleForm.zhaopian=data;
+          // this.ruleForm.zhaopian=data;
+          Vue.set(this.ruleForm,"zhaopian",data)
+          
         },
         setClickDisabled(bool){
           this.clickDisabled = bool;
