@@ -49,32 +49,33 @@
 				<el-row class="container">
 					<el-col :span='24' >
 						<el-row class="all-classify">
-							<el-col :span='22' >
+							<el-col :span='20' >
 							</el-col>
 							<el-col :span='2'>
-								<el-button type="success" size="mini" @click="changeFn(tableList.bianhao,'1')">新建</el-button>
+								<el-button type="info" size="mini" @click="exportFn()">导出</el-button>
+							</el-col>
+							<el-col :span='2'>
+								<el-button type="success" size="mini" @click="addFn">新建</el-button>
 							</el-col>
 						</el-row>
 					</el-col>
 				</el-row>
-	            <el-table :data="tableDatas"  border style="width: 100%;" v-loading="loading">
+	          <!--  <el-table :data="tableDatas"  border style="width: 100%;" v-loading="loading" @row-click="changeFn(scope.row.bianhao,'2',scope.row.cardFlag)">
+	           -->
+			    <el-table :data="tableDatas"  border style="width: 100%;" v-loading="loading" @row-click="changeFn">
+				 
 				    <el-table-column  align="center"   prop="xuhao" label="序号">  </el-table-column>
 				    <el-table-column   align="center"  prop="zhenghao" label="卡号">  </el-table-column>
-				    <el-table-column   align="center"  prop="xingming" label="姓名">  </el-table-column>
+				    <el-table-column   align="center"  prop="xingming" label="姓名" >  </el-table-column>
 				    <el-table-column  align="center"   prop="xingbie" label="性别">  </el-table-column>
 				    <el-table-column  align="center"   prop="bumen" label="部门">  </el-table-column>
 				    <el-table-column  align="center"   prop="zhiwu" label="职务">  </el-table-column>
 				    <el-table-column  align="center"   prop="zhicheng" label="职称">  </el-table-column>
 				    <el-table-column  align="center"   prop="zhuangtai" label="状态">  </el-table-column>
-				    <el-table-column  align="center"   prop="cardFlag" label="标志">  </el-table-column>
-					
-                    <!--必选参数：type（1:添加 2:修改 9:删除）-->
-		            <el-table-column label="相关操作"  >
-		          		<template slot-scope="scope" >
-	           				<el-button size="small" @click="changeFn(scope.row.bianhao,'2',scope.row.cardFlag)">编辑</el-button>
-	           			</template>
-		       		</el-table-column>
 				</el-table>
+				<div class="TotalRecords RedColor">
+					共{{count}}记录
+				</div>
 				 <el-pagination class="pagination"  @current-change="handleCurrentChange" background layout="prev, pager, next , jumper"  :current-page.sync="tableList.pageIndex" :total="totalCount" > 
 			</el-pagination> 
 		</div>
@@ -85,7 +86,7 @@
 	import qs from 'qs'
 	import Vue from 'vue'
 	import router from '@/router'
-	import {getUserList,BumenZhuangtaiSelect} from '../../api/api.js'
+	import {localHostUrl,getUserList,BumenZhuangtaiSelect} from '../../api/api.js'
 	import {setCookie,getCookie,delCookie} from '../../cookie/cookie.js'
 	export default{
 		data(){
@@ -106,7 +107,8 @@
 				},
 				tableDatas:[],//列表的值
 				cardFlag:'',
-				params:""
+				params:"",
+				count:''
 				//  zhuangtaiSelect:[],
        			//  bumenSelect:[]
 			}
@@ -137,6 +139,7 @@
 			getTablelist(){
 				getUserList(this.tableList).then((data) => {
 					if(data.code==1){
+						this.count=data.pageSum.count
 						this.tableDatas=data.data
 						this.totalCount=data.pageSum.pageNum
 						// setCookie('userListData',this.tableDatas,1000*60)
@@ -170,18 +173,18 @@
 				})
 			},
 			//（1:添加 2:修改 9:删除）
-			changeFn(bianhao,AddOrChange,cardFlag){
-				if(AddOrChange==2){
-					if(cardFlag==1){
-						this.$router.push({path:'/userListChange',query:{bianhao:bianhao,AddOrChange:2,params:this.params}})
-					}else{
-						alert("暂时不支持临时卡")
-					}
-				}else if(AddOrChange==1){
-					this.$router.push({path:'/userListChange',query:{AddOrChange:1}})
-
+			changeFn(row){
+				let bianhao = row.bianhao
+				let cardFlag = row.cardFlag
+				if(cardFlag==1){
+					this.$router.push({path:'/userListChange',query:{bianhao:bianhao,AddOrChange:2,params:this.params}})
+				}else{
+					alert("暂时不支持临时卡")
 				}
 
+			},
+			addFn(row){
+				this.$router.push({path:'/userListChange',query:{AddOrChange:1}})
 			},
 			setReset(){
 				this.tableList.bumenname=''
@@ -190,7 +193,10 @@
 				this.tableList.xingming=''
 				
 			},
-		
+			exportFn(settId,pageIndex){
+				var url = `${localHostUrl}exportBillBySettId.json?settId=${settId}`
+				window.location.href=url
+	        }
 		},
 		mounted(){
 			this.getTablelist();

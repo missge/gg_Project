@@ -7,12 +7,16 @@
       </div>
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" size="mini" label-width="100px" class="demo-ruleForm contr_time" >
           <el-row :gutter="24">
+           
               <el-col :span="12">
                     <el-form-item label="证号" >
                       <el-input v-model="ruleForm.zhenghao" :disabled="true"></el-input>
                     </el-form-item>
                     <el-form-item label="姓名" prop="xingming">
                       <el-input v-model="ruleForm.xingming"></el-input>
+                    </el-form-item>
+                      <el-form-item label="物理码" prop="desc">
+                      <el-input v-model="ruleForm.wulima" :disabled="true" height="20px"></el-input>
                     </el-form-item>
                     <!--<el-form-item label="用户级别">
                       <el-radio-group v-model="ruleForm.userLevel">
@@ -22,40 +26,50 @@
                       </el-radio>
                       </el-radio-group>
                     </el-form-item>-->
-                  <el-form-item label="状态">
-                      <el-select v-model="ruleForm.zhuangtai" placeholder="请选择" >
-                        <!-- <el-option
-                          v-for="item in selectList"
-                          :key="item.key"
-                          :label="item.label"
-                          :value="item.value" >
-                        </el-option> -->
-                      <el-option
-                          v-for="(item,index) in selectList"
-                          :key="index"
-                          :label="item[index]"
-                          :value="item[index]" >
-                        </el-option>
+                       <el-row :gutter="24">
+                        <el-col :span="12">
+                          <el-form-item label="状态">
+                            <el-select v-model="ruleForm.zhuangtai" placeholder="请选择" >
+                              <el-option
+                                  v-for="(item,index) in selectList"
+                                  :key="index"
+                                  :label="item[index]"
+                                  :value="item[index]" >
+                                </el-option>
+                          </el-select>
+                          
+                          </el-form-item>
+                          <el-form-item label="部门:" prop="bumen">
+                            <el-select v-model="ruleForm.bumen" placeholder=""> 
+                                <el-option
+                                  v-for="(item,index) in bumenList"
+                                  :key="index"
+                                  :label="item[index]"
+                                  :value="item[index]" >
+                                </el-option>
+                            </el-select>
+                          </el-form-item> 
+                           <el-form-item label="性别" prop="xingbie">
+                            <el-radio-group v-model="ruleForm.xingbie">
+                              <el-radio label="男"></el-radio>
+                              <el-radio label="女"></el-radio>
+                            </el-radio-group>
+                          </el-form-item>
+                        </el-col> 
+                        <el-col :span="12">
+                          <div class="upimage">
+                            <!--<span>上传照片</span>-->
+                            <div class="uploader">
+                              <div v-if="clickDisabled">  
+                                  <img :src="ruleForm.zhaopian" width="120px" height="130px" >
+                                </div> 
+                              <uploader  :userName="this.ruleForm.xingming"   :src="this.localHostUrl+'/updateFile.json'" @newNodeEvent="parentLisen" @getFileIds="setFileIds" @getClickDisabled="setClickDisabled" ></uploader>
+                            </div>
+                          </div>
+                         </el-col> 
+                        </el-row>
 
-                    </el-select>
-                    
-                    </el-form-item>
-                    <el-form-item label="部门:" prop="bumen">
-                      <el-select v-model="ruleForm.bumen" placeholder=""> 
-                          <el-option
-                            v-for="(item,index) in bumenList"
-                            :key="index"
-                            :label="item[index]"
-                            :value="item[index]" >
-                          </el-option>
-                      </el-select>
-                    </el-form-item> 
-                    <el-form-item label="性别" prop="xingbie">
-                      <el-radio-group v-model="ruleForm.xingbie">
-                        <el-radio label="男"></el-radio>
-                        <el-radio label="女"></el-radio>
-                      </el-radio-group>
-                    </el-form-item>
+                   
                     <el-form-item label="职务" >
                       <el-input v-model="ruleForm.zhiwu"></el-input>
                     </el-form-item>
@@ -69,6 +83,13 @@
                     <el-form-item label="领卡人" >
                       <el-input v-model="ruleForm.lingkaren"></el-input>
                     </el-form-item>
+                     <el-form-item label="领卡时间" >
+                      <el-col :span="11">
+                        <el-form-item >
+                          <el-date-picker type="date" placeholder="领卡时间" v-model="ruleForm.lingkashijian" style="width: 100%;"></el-date-picker>
+                        </el-form-item>
+                      </el-col>
+                    </el-form-item>
                     <el-form-item label="退卡人" >
                       <el-input v-model="ruleForm.tuikaren"></el-input>
                     </el-form-item>
@@ -79,9 +100,7 @@
                         </el-form-item>
                       </el-col>
                     </el-form-item>
-                    <el-form-item label="备注" prop="desc">
-                      <el-input type="textarea" v-model="ruleForm.beizhu"></el-input>
-                    </el-form-item>
+                  
                     <el-form-item label="出院时间" >
                       <el-col :span="11">
                         <el-form-item >
@@ -98,6 +117,9 @@
                   </el-form-item>
                   <el-form-item label="身份证号" >
                     <el-input v-model="ruleForm.shenfenzheng"></el-input>
+                  </el-form-item>
+                     <el-form-item label="身份证住址" >
+                    <el-input v-model="ruleForm.shenfenzhengzhuzhi"></el-input>
                   </el-form-item>
                   <el-form-item label="籍贯" >
                     <el-input v-model="ruleForm.jiguan"></el-input>
@@ -132,30 +154,15 @@
                   <el-form-item label="家庭住址" >
                     <el-input v-model="ruleForm.jiatingzhuzhi"></el-input>
                   </el-form-item>
-                  <el-form-item label="身份证住址" >
-                    <el-input v-model="ruleForm.shenfenzhengzhuzhi"></el-input>
-                  </el-form-item>
-                   <el-form-item label="物理码" prop="desc">
-                      <el-input v-model="ruleForm.wulima" :disabled="true" height="20px"></el-input>
+                    <el-form-item label="备注" prop="desc">
+                      <el-input type="textarea" v-model="ruleForm.beizhu"></el-input>
                     </el-form-item>
-                   <el-form-item label="领卡时间" >
-                      <el-col :span="11">
-                        <el-form-item >
-                          <el-date-picker type="date" placeholder="领卡时间" v-model="ruleForm.lingkashijian" style="width: 100%;"></el-date-picker>
-                        </el-form-item>
-                      </el-col>
-                    </el-form-item>
+               
+                 
+                  
               </el-col>
           </el-row>
-          <div class="upimage">
-            <span>上传照片</span>
-            <div class="uploader">
-               <div v-if="clickDisabled">  
-                  <img :src="ruleForm.zhaopian" width="120px" height="130px" >
-                </div> 
-              <uploader  :userName="this.ruleForm.xingming"   :src="this.localHostUrl+'/updateFile.json'" @newNodeEvent="parentLisen" @getFileIds="setFileIds" @getClickDisabled="setClickDisabled" ></uploader>
-            </div>
-          </div>
+          
           <el-form-item>
             <el-button type="primary" @click="seveFn()">保存</el-button>
             <el-button  @click="returnFn()">返回</el-button>
@@ -396,7 +403,7 @@
               
               saveUserList(this.ruleForm).then((data)=>{
                 if(data.code==1){
-                    if(this.$route.query.AddOrChange){
+                    if(this.$route.query.AddOrChange==2){
                       alert("修改成功")
                       // this.$router.push({path:'/userList'})
                       // this.getTablelist()
@@ -639,7 +646,7 @@
  /* .contr_time  .el-form-item--mini.el-form-item{margin-bottom:0px;} */
   .upimage{
     position: relative;
-    width: 50%;
+   /* width: 50%;*/
   }
   .upimage span{
     position: absolute;
@@ -651,12 +658,14 @@
   .uploader{
     border: 1px solid #c0ccda;
     border-radius: 5px;
-    width: 75%;
-    margin-left:100px;
+   /* width: 75%;
+    margin-left:100px;*/
+    overflow:hidden;
   }
 .pageButton{
   color: #55c5f5;
  cursor: pointer;
   }
-
+  .uploader>div{float:left;}
+  .uploader>.vue-uploader{float:left;}
 </style>

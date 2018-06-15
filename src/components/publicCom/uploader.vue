@@ -2,7 +2,7 @@
     <div class="vue-uploader">
         <div class="file-list">
             <section v-for="(file, index) of files" class="file-item draggable-item file-box"  v-if="!isShow">
-                <img :src="file.src" alt="" ondragstart="return false;">
+                <img :src="file.src" alt="" ondragstart="return false;" width="120px" height="130px">
                 <!-- <p class="file-name">{{file.name}}</p> -->
                 <!--&lt;!&ndash;<span class="file-remove" @click="remove(index)">+</span>&ndash;&gt;删除按钮-->
             </section>
@@ -12,9 +12,9 @@
             </section>
 
         </div>
-         <div class="file-Explain">
+       <!--  <div class="file-Explain">
             图片在3M以上，支持jpg,png等格式
-        </div>
+        </div>-->
         <section v-if="files.length != 0" class="upload-func">
             <div class="progress-bar">
                 <section v-if="uploading" :width="(percent * 100) + '%'">{{(percent * 100) + '%'}}</section>
@@ -226,6 +226,7 @@
 }
 .vue-uploader .file-list {
     padding: 5px 0px;
+    overflow: hidden;
 }
 .vue-uploader .file-list:after {
     content: '';
@@ -237,10 +238,11 @@
     font-size: 0;
 }
 .vue-uploader .file-list .file-item {
-    float: left;
+    /*float: left;
     position: relative;
     width: 33%;
-    text-align: center;
+    text-align: center;*/
+    float: left;
 }
 .vue-uploader .file-list .file-item img{
     width: 90%;
@@ -276,34 +278,34 @@
     -webkit-box-orient: vertical;
 }
 .vue-uploader .file-list .file-box{
-      width: 33%;
-      height: 160px;
-      margin-left: 74px;
-      float: left;
-      text-align: center;
-      line-height: 80px;
-      border: 2px dashed #ececec;
-      font-size: 30px;
-      cursor: pointer;
+         width: 120px;
+    height: 130px;
+    /* margin-left: 74px; */
+    float: left;
+    text-align: center;
+    /* line-height: 80px; */
+    border: 2px dashed #ececec;
+    font-size: 30px;
+    cursor: pointer;
 }
 .vue-uploader .file-list .file-box img{
     width: 100%;
     height: 100%;
 }
 .vue-uploader .add {
-    margin:50px 0 50px 74px;
-    width: 80px;
-    height:30px;
-    float: left;
+      margin: 0 15px;
+    /* width: 80px; */
+    height: 30px;
+    /* float: left; */
     text-align: center;
     cursor: pointer;
 }
 .vue-uploader .upload-func {
-    display: flex;
+ /*   display: flex;
     padding: 10px;
     margin: 0px;
     background: #f8f8f8;
-    border-top: 1px solid #ececec;
+    border-top: 1px solid #ececec;*/
 }
 .vue-uploader .upload-func .progress-bar {
     flex-grow: 1;

@@ -53,4 +53,15 @@ a{text-decoration: none}
   font-size: 14px;
 }
   .all-classify .el-col{text-align: left;padding: 8px 16px;}
+  .el-table tr :hover{
+    cursor:pointer;
   
+  }
+  .TotalRecords{
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin-top: 10px;
+    padding-left: 20px;
+
+  }
